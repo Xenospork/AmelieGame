@@ -14,18 +14,15 @@ pygame.init()
 gameDisplay = pygame.display.set_mode((display_width,display_height)) #This defines the canvas - the window that comes up on the screen
 pygame.display.set_caption('Hello world') #This is what the window is called
 
-#######
-def things(thingx, thingy, thingw, thingh, color):
-    pygame.draw.rect(gameDisplay, color, [thingx, thingy, thingw, thingh])
-#######
-
 container = pygame.Surface([10,10])
 
 black = (255,0,0) #rgb definitions of these colours to prevent us having to type out the numbers later
 white = (255,255,255)
 
+backImg = pygame.transform.scale(pygame.image.load("resources\\background.png"),(display_width,display_height))
+#gameDisplay.blit(backImg,(0,0))
 bunScale = 0.5
-charScale = 0.1
+charScale = 0.06
 bunWidth = int(bunScale*537)#These are the original dimensions of the bunny. I'll use them to scale the bunny in a second.
 bunHeight = int(bunScale*784)
 charWidth = int(charScale*675)
@@ -61,13 +58,27 @@ thing_height = 100
 xCross = 0
 yCross = 0 
 
-
-  
+class wall:
+    def __init__(self,surface,x,y):
+        self.surface = surface
+        self.x = x
+        self.y = y
+    def drawWall(self):
+        self.wallImg = pygame.draw.rect(self.surface,(255,0,0),(self.x,self.y,50,50),0)
+        #self.surface.blit(self.wallImg)
+maze = [
+['.','.','w','w','w'],
+['w','.','w','w','.'],
+['.','.','w','.','.'],
+['.','w','.','.','w'],
+['.','.','.','w','w']
+]
+mazeX = 200
+mazeY = 200
 while not crashed:
 ######
 
 
-    thing_starty += thing_speed
     ######
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -76,13 +87,9 @@ while not crashed:
         print(event)
         
     gameDisplay.fill(white)
-    
-    char()
-    bunny() # let's try putting the bunny on the screen
-    ######### Movement behaviour for character. When an arrow key is pressed, we assign a value to y/xchar_change
-    ######### we update the xchar and ychar coordinates, and next time our character is drawn, we change the coordinates
-    ######### when you let go of the key, the change variable is set to 0, and the position stops changing every frame
-    if event.type == pygame.KEYDOWN:
+    #gameDisplay.blit(backImg,(0,0))
+    #pygame.draw.rect(gameDisplay,(255,0,0),(0,0,100,100),0)
+    if event.type == pygame.KEYDOWN and not bunRect.colliderect(charRect):
         if event.key == pygame.K_DOWN:
             ychar_change = 5
         elif event.key == pygame.K_UP:
@@ -97,32 +104,44 @@ while not crashed:
         if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT: 
             xchar_change = 0
     #########  
-    if bunRect.colliderect(charRect):
+    if charRect.y < 0:
+        charRect.y = 0
+    elif charRect.y > display_height-charHeight:
+        charRect.y = display_height-charHeight
+    if charRect.x < 0:
+        charRect.x = 0
+    elif charRect.x > display_width-charWidth:
+        charRect.x = display_width - charWidth    
+    for row in range(len(maze)):
+        for column in range(len(maze[row])):
+            if maze[row][column] == 'w':
+                p = wall(gameDisplay,column*50,row*50)
+                p.drawWall()
+                if charRect.colliderect(p.wallImg):
+                    charRect.y += -2*ychar_change
+                    charRect.x += -2*xchar_change
+                    ychar_change = 0
+                    xchar_change = 0
+                    
+    charRect.y += ychar_change
+    charRect.x += xchar_change    
+    char()
+    bunny() # let's try putting the bunny on the screen
+    ######### Movement behaviour for character. When an arrow key is pressed, we assign a value to y/xchar_change
+    ######### we update the xchar and ychar coordinates, and next time our character is drawn, we change the coordinates
+    ######### when you let go of the key, the change variable is set to 0, and the position stops changing every frame
+
+    '''if bunRect.colliderect(charRect): #Collision detection must take place at the end of loop, otherwise
+        #there's a chance you'll collide after this detection, and you won't be able to get out!
         #print("collide")
-        charRect.y += -ychar_change
-        charRect.x += -xchar_change
+        charRect.y += -2*ychar_change
+        charRect.x += -2*xchar_change
         ychar_change = 0
         xchar_change = 0
     charRect.y += ychar_change
-    charRect.x += xchar_change
-    if charRect.y < 0:
-        charRect.y = 0
-    #elif ychar > display_height-charHeight:
-    #    ychar = display_height-charHeight
-    #if xchar < 0:
-   #     xchar = 0
-   # elif xchar > display_width-charWidth:
-   #     xchar = display_width - charWidth
-   # things(thing_startx, thing_starty, thing_width, thing_height, black)
-    #if thing_starty > display_height:
-    #    thing_starty = 0 - thing_height
-   # if thing_startx < xchar and xchar < thing_startx + thing_width:
-   #     #print("x crossover")
-   #     xCross = 1
-   # if ychar > thing_starty and ychar < thing_starty + thing_height:
-        #print("Y crossover")
-   #     yCross = 1
+    charRect.x += xchar_change'''
 
+   
     pygame.display.update()
     clock.tick(60)
     
