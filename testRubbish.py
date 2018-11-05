@@ -5,6 +5,7 @@ Created on Thu Nov  1 19:52:50 2018
 @author: matth
 """
 import pygame
+import os
 
 display_width = 800 #Defining these here, as I will create sprites that are located at some fraction of these lengths
 display_height = 600
@@ -19,7 +20,9 @@ container = pygame.Surface([10,10])
 black = (255,0,0) #rgb definitions of these colours to prevent us having to type out the numbers later
 white = (255,255,255)
 
-backImg = pygame.transform.scale(pygame.image.load("resources\\background.png"),(display_width,display_height))
+rDir = "resources"
+
+#backImg = pygame.transform.scale(pygame.image.load(os.path.join(rDir,"background.png"),(display_width,display_height)))
 #gameDisplay.blit(backImg,(0,0))
 bunScale = 0.5
 charScale = 0.06
@@ -27,8 +30,8 @@ bunWidth = int(bunScale*537)#These are the original dimensions of the bunny. I'l
 bunHeight = int(bunScale*784)
 charWidth = int(charScale*675)
 charHeight = int(charScale*781)
-bunImg = pygame.transform.scale(pygame.image.load("resources\\bunny.png"),(bunWidth,bunHeight)) #defining bunImg, which means we can use the bunny image later on
-charImg = pygame.transform.scale(pygame.image.load("resources\\charTest.png"),(charWidth,charHeight))
+bunImg = pygame.transform.scale(pygame.image.load(os.path.join(rDir,"bunny.png")),(bunWidth,bunHeight)) #defining bunImg, which means we can use the bunny image later on
+charImg = pygame.transform.scale(pygame.image.load(os.path.join(rDir,"charTest.png")),(charWidth,charHeight))
 charRect = charImg.get_rect()
 bunRect = bunImg.get_rect()
 
