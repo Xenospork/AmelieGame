@@ -44,8 +44,9 @@ class wall(pygame.sprite.Sprite):
         self.wallRect.x = 300
         self.wallRect.y = 300
             
-c = char(0.15,5)
+c = char(0.1,5)
 w = wall()
+
 pygame.init()
 
 display_width = 800 #Defining these here, as I will create sprites that are located at some fraction of these lengths
@@ -55,14 +56,18 @@ screen = pygame.display.set_mode([display_width,display_height])
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption("Collision Detection Test")
 
+screen.blit(w.wallSurface,w.wallRect)
+
 finished = False
 clock = pygame.time.Clock()
 
 allSpriteGroup = pygame.sprite.Group()
+wallSpriteGroup = pygame.sprite.Group()
 
 allSpriteGroup.add(c)
 allSpriteGroup.add(w)
 
+wallSpriteGroup.add(w)
 collideTest = False
 
 while not finished:
@@ -70,7 +75,8 @@ while not finished:
         if event.type == pygame.QUIT: 
             finished = True
     screen.fill(white)
-    screen.blit(w.wallSurface,w.wallRect)
+    wallSpriteGroup.draw(screen)
+    #screen.blit(w.wallSurface,w.wallRect)
   
     
 
@@ -86,6 +92,8 @@ while not finished:
             c.dx += -c.speed
         elif event.key == pygame.K_RIGHT:
             c.dx += c.speed
+    c.move()   
+    screen.blit(c.charImg,c.charRect)
     if event.type == pygame.KEYUP:
         if event.key == pygame.K_DOWN:
             c.dy = 0 
@@ -101,15 +109,19 @@ while not finished:
         collideTest = True
         if c.dy < 0:
             c.charRect.y = w.wallRect.y + w.wallRect.height
-            c.dy = -c.dy
+            c.dy = 0#-c.dy
         elif c.dy > 0:
             c.charRect.y = w.wallRect.y - c.charRect.height
-            c.dy = -c.dy
+            c.dy = 0#-c.dy
+        elif c.dx < 0:
+            c.charRect.x = w.wallRect.x + w.wallRect.width
+            c.dx = 0
+        elif c.dx > 0:
+            c.charRect.x = w.wallRect.x - c.charRect.width
     else:
         collideTest = False
  ####################################### 
-    c.move()   
-    screen.blit(c.charImg,c.charRect)          
+       
 
     c.dx = 0
     c.dy = 0
